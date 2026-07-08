@@ -1,0 +1,84 @@
+<h2>搜索框风格选项</h2>
+<p class="subtitle">同一个页面，搜索框的不同处理方式</p>
+
+<div class="section">
+  <h3>选项 A：更透明更低调</h3>
+  <p class="subtitle">高度缩小 + 透明度降低 + 无边框，几乎融入背景</p>
+  <div style="background:linear-gradient(180deg, #E6EDF5 0%, #EEF2F8 40%, #EDF2F7 100%);padding:20px;border-radius:14px;">
+    <div style="display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+      <h3 style="margin:0;font-size:24px;font-weight:600;color:#3A5068;">纪念日</h3>
+    </div>
+    <div style="display:flex;align-items:center;background:rgba(255,255,255,0.35);border:none;border-radius:12px;padding:6px 14px;margin-bottom:12px;">
+      <span style="opacity:0.4;">🔍</span>
+      <input style="flex:1;border:none;outline:none;padding:8px 10px;font-size:13px;background:transparent;color:#8A9EB0;" placeholder="搜索..." value="" readonly>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="backdrop-filter:blur(14px);background:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.7);border-radius:14px;padding:14px 16px;">
+        <span style="font-size:14px;font-weight:700;color:#3A5068;">妈妈</span>
+        <span style="font-size:12px;color:#8A9EB0;margin-left:8px;">生日</span>
+        <div style="font-size:12px;color:#A0B5C8;margin-top:4px;">2026-07-07 · 距今天 0 天</div>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:#90A8BB;margin-top:10px;">搜索框几乎隐形，不抢视觉</div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:20px;">
+  <h3>选项 B：可折叠搜索</h3>
+  <p class="subtitle">默认只显示🔍图标，点击展开搜索框</p>
+  <div style="background:linear-gradient(180deg, #E6EDF5 0%, #EEF2F8 40%, #EDF2F7 100%);padding:20px;border-radius:14px;">
+    <div style="display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+      <h3 style="margin:0;font-size:24px;font-weight:600;color:#3A5068;">纪念日</h3>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+      <button style="background:rgba(255,255,255,0.5);border:none;border-radius:20px;padding:8px 16px;font-size:13px;color:#8A9EB0;cursor:pointer;display:flex;align-items:center;gap:6px;">🔍 <span>搜索</span></button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="backdrop-filter:blur(14px);background:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.7);border-radius:14px;padding:14px 16px;">
+        <span style="font-size:14px;font-weight:700;color:#3A5068;">妈妈</span>
+        <span style="font-size:12px;color:#8A9EB0;margin-left:8px;">生日</span>
+        <div style="font-size:12px;color:#A0B5C8;margin-top:4px;">2026-07-07 · 距今天 0 天</div>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:11px;color:#90A8BB;margin-top:10px;">默认折叠，需要时点击展开</div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:20px;">
+  <h3>选项 C：底部搜索栏</h3>
+  <p class="subtitle">搜索框移到页面底部，顶部留白干净</p>
+  <div style="background:linear-gradient(180deg, #E6EDF5 0%, #EEF2F8 40%, #EDF2F7 100%);padding:20px;border-radius:14px;min-height:260px;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+      <h3 style="margin:0;font-size:24px;font-weight:600;color:#3A5068;">纪念日</h3>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+      <div style="backdrop-filter:blur(14px);background:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.7);border-radius:14px;padding:14px 16px;">
+        <span style="font-size:14px;font-weight:700;color:#3A5068;">妈妈</span>
+        <span style="font-size:12px;color:#8A9EB0;margin-left:8px;">生日</span>
+        <div style="font-size:12px;color:#A0B5C8;margin-top:4px;">2026-07-07 · 距今天 0 天</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);border-radius:14px;padding:6px 14px;margin-top:12px;">
+      <span style="opacity:0.4;">🔍</span>
+      <input style="flex:1;border:none;outline:none;padding:8px 10px;font-size:13px;background:transparent;color:#8A9EB0;" placeholder="搜索..." value="" readonly>
+    </div>
+    <div style="text-align:center;font-size:11px;color:#90A8BB;margin-top:10px;">搜索在底部，顶部干净纯粹</div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:20px;">
+  <div class="options">
+    <div class="option" data-choice="search-a" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content"><h3>更透明更低调</h3><p>缩小+淡化，融入背景</p></div>
+    </div>
+    <div class="option" data-choice="search-b" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content"><h3>可折叠搜索</h3><p>默认图标按钮，点击展开</p></div>
+    </div>
+    <div class="option" data-choice="search-c" onclick="toggleSelect(this)">
+      <div class="letter">C</div>
+      <div class="content"><h3>底部搜索栏</h3><p>移到页面底部</p></div>
+    </div>
+  </div>
+</div>
