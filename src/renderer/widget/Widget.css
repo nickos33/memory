@@ -1,0 +1,111 @@
+.widget-panel {
+  background: rgba(42, 58, 80, 0.78);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 12px 14px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  -webkit-app-region: drag;
+  user-select: none;
+  cursor: default;
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  -webkit-app-region: no-drag;
+}
+
+.widget-title {
+  font-family: "Zapfino", "Snell Roundhand", "Apple Chancery", "Bradley Hand", cursive;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.widget-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-app-region: no-drag;
+}
+.widget-list::-webkit-scrollbar { width: 0; }
+
+.widget-empty {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  padding: 12px 0;
+}
+
+.widget-item {
+  padding: 10px 10px;
+  margin-bottom: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  cursor: pointer;
+  min-height: 42px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+.widget-item:last-child { margin-bottom: 0; }
+.widget-item:hover { background: rgba(255, 255, 255, 0.12); }
+
+.widget-item-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.widget-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.widget-item-countdown {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  margin-left: 8px;
+}
+.widget-item-countdown.soon {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+}
+.widget-item-countdown.past-countdown {
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 400;
+}
+
+.widget-item-meta {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 1px;
+}
+
+.widget-item.past {
+  opacity: 0.5;
+}
+
+.widget-hidden-bar {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  padding: 6px 0 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 4px;
+  cursor: pointer;
+}
+.widget-hidden-bar:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
