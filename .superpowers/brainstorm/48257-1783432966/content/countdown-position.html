@@ -1,0 +1,128 @@
+<h2>倒计时显示位置 — 三种方案对比</h2>
+<p class="subtitle">同一张卡片，倒计时放在不同位置的感觉完全不同</p>
+
+<div style="display:flex;flex-direction:column;gap:16px;">
+
+  <!-- 方案A: 右侧内嵌 -->
+  <div style="background:linear-gradient(180deg, #E6EDF5 0%, #EEF2F8 40%, #EDF2F7 100%);padding:14px 16px;border-radius:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:#007AFF;color:white;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">A</span>
+      <span style="font-size:12px;color:#6B8299;">日期行右侧 — 跟着日期信息走，最自然</span>
+    </div>
+    <div style="backdrop-filter:blur(14px);background:rgba(255,255,255,0.72);border:1px solid rgba(255,255,255,0.85);border-radius:16px;padding:16px 18px;border-left:3px solid #007AFF;">
+      <div style="display:flex;justify-content:space-between;">
+        <span>📌</span>
+        <div style="display:flex;gap:2px;">
+          <button style="border:none;background:none;font-size:15px;padding:4px 6px;opacity:0.3;border-radius:8px;">✎</button>
+          <button style="border:none;background:none;font-size:15px;padding:4px 6px;opacity:0.3;border-radius:8px;">✕</button>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+        <span style="font-size:12px;color:#8A9EB0;font-weight:500;">2026年7月7日</span>
+        <span style="font-size:10px;background:rgba(0,122,255,0.1);color:#007AFF;padding:2px 8px;border-radius:8px;font-weight:700;">今天</span>
+        <span style="margin-left:auto;font-size:12px;color:#90A8BB;font-weight:500;">距今天 0 天</span>
+      </div>
+      <div style="font-size:19px;font-weight:700;color:#3A5068;margin-top:4px;">妈妈</div>
+      <div style="font-size:13px;color:#007AFF;font-weight:500;margin-top:2px;">生日</div>
+      <div style="font-size:12px;color:#8A9EB0;margin-top:3px;">记得买蛋糕 🎂</div>
+    </div>
+  </div>
+
+  <!-- 方案B: big number -->
+  <div style="background:linear-gradient(180deg, #E6EDF5 0%, #EEF2F8 40%, #EDF2F7 100%);padding:14px 16px;border-radius:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:#007AFF;color:white;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">B</span>
+      <span style="font-size:12px;color:#6B8299;">右下角大字 — 倒计时作为卡片核心信息，一眼看到</span>
+    </div>
+    <div style="backdrop-filter:blur(14px);background:rgba(255,255,255,0.72);border:1px solid rgba(255,255,255,0.85);border-radius:16px;padding:16px 18px;border-left:3px solid #007AFF;display:flex;justify-content:space-between;">
+      <div style="flex:1;">
+        <div style="display:flex;justify-content:space-between;">
+          <span>📌</span>
+          <div style="display:flex;gap:2px;">
+            <button style="border:none;background:none;font-size:15px;padding:4px 6px;opacity:0.3;border-radius:8px;">✎</button>
+            <button style="border:none;background:none;font-size:15px;padding:4px 6px;opacity:0.3;border-radius:8px;">✕</button>
+          </div>
+        </div>
+        <div style="margin-top:6px;"><span style="font-size:12px;color:#8A9EB0;font-weight:500;">2026年7月7日</span> <span style="font-size:10px;background:rgba(0,122,255,0.1);color:#007AFF;padding:2px 8px;border-radius:8px;font-weight:700;margin-left:4px;">今天</span></div>
+        <div style="font-size:19px;font-weight:700;color:#3A5068;margin-top:4px;">妈妈</div>
+        <div style="font-size:13px;color:#007AFF;font-weight:500;margin-top:2px;">生日</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding-left:12px;">
+        <span style="font-size:32px;font-weight:800;color:#007AFF;line-height:1;">0</span>
+        <span style="font-size:11px;color:#8A9EB0;font-weight:500;">天</span>
+      </div>
+    </div>
+    <div style="margin-top:6px;">
+      <div style="backdrop-filter:blur(14px);background:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.7);border-radius:16px;padding:16px 18px;display:flex;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;">
+            <span style="opacity:0.25;">📌</span>
+            <div style="display:flex;gap:2px;">
+              <button style="border:none;background:none;font-size:15px;padding:4px 6px;opacity:0.25;border-radius:8px;">✎</button>
+              <button style="border:none;background:none;font-size:15px;padding:4px 6px;opacity:0.25;border-radius:8px;">✕</button>
+            </div>
+          </div>
+          <div style="margin-top:6px;"><span style="font-size:12px;color:#8A9EB0;font-weight:500;">2025年12月25日</span></div>
+          <div style="font-size:19px;font-weight:700;color:#3A5068;margin-top:4px;">妻子</div>
+          <div style="font-size:13px;color:#007AFF;font-weight:500;margin-top:2px;">结婚纪念日</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding-left:12px;">
+          <span style="font-size:32px;font-weight:800;color:#8A9EB0;line-height:1;">171</span>
+          <span style="font-size:11px;color:#8A9EB0;font-weight:500;">天后</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案C: 底部栏 -->
+  <div style="background:linear-gradient(180deg, #E6EDF5 0%, #EEF2F8 40%, #EDF2F7 100%);padding:14px 16px;border-radius:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span style="background:#007AFF;color:white;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;">C</span>
+      <span style="font-size:12px;color:#6B8299;">卡片底部小字 — 最低调，不干扰主要信息</span>
+    </div>
+    <div style="backdrop-filter:blur(14px);background:rgba(255,255,255,0.72);border:1px solid rgba(255,255,255,0.85);border-radius:16px;padding:16px 18px;border-left:3px solid #007AFF;">
+      <div style="display:flex;justify-content:space-between;">
+        <span>📌</span>
+        <div style="display:flex;gap:2px;">
+          <button style="border:none;background:none;font-size:15px;padding:4px 6px;opacity:0.3;border-radius:8px;">✎</button>
+          <button style="border:none;background:none;font-size:15px;padding:4px 6px;opacity:0.3;border-radius:8px;">✕</button>
+        </div>
+      </div>
+      <div style="margin-top:6px;"><span style="font-size:12px;color:#8A9EB0;font-weight:500;">2026年7月7日</span> <span style="font-size:10px;background:rgba(0,122,255,0.1);color:#007AFF;padding:2px 8px;border-radius:8px;font-weight:700;margin-left:4px;">今天</span></div>
+      <div style="font-size:19px;font-weight:700;color:#3A5068;margin-top:4px;">妈妈</div>
+      <div style="font-size:13px;color:#007AFF;font-weight:500;margin-top:2px;">生日</div>
+      <div style="font-size:12px;color:#8A9EB0;margin-top:3px;">记得买蛋糕 🎂</div>
+      <div style="border-top:1px solid rgba(0,0,0,0.04);margin-top:10px;padding-top:8px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:11px;color:#90A8BB;">距今天 <b style="color:#007AFF;">0</b> 天</span>
+        <span style="font-size:10px;color:#B0C4D8;">每年重复</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section" style="margin-top:20px;">
+  <div class="options">
+    <div class="option" data-choice="pos-a" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <h3>日期行右侧</h3>
+        <p>和日期一起出现，逻辑最顺，不抢眼球</p>
+      </div>
+    </div>
+    <div class="option" data-choice="pos-b" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <h3>右侧大字</h3>
+        <p>倒计时是最重要的信息（临近日期自动变蓝醒目）</p>
+      </div>
+    </div>
+    <div class="option" data-choice="pos-c" onclick="toggleSelect(this)">
+      <div class="letter">C</div>
+      <div class="content">
+        <h3>底部小字 + 分隔线</h3>
+        <p>最低调，信息最丰富（可扩展每年重复等标签）</p>
+      </div>
+    </div>
+  </div>
+</div>
