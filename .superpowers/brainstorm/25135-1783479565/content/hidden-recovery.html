@@ -1,0 +1,33 @@
+<h2>隐藏的纪念日如何恢复 — 方案确认</h2>
+<p class="subtitle">你选择了 A + B 组合方案</p>
+
+<div class="section">
+  <h3>A: 小组件底部加一个"已隐藏 N 个"按钮</h3>
+  <p>点击后弹出/展开显示所有已隐藏的纪念日，灰色半透明显示，点击即可恢复</p>
+</div>
+
+<div class="section">
+  <h3>B: 右键菜单加"恢复全部"</h3>
+  <p>在小组件的右键菜单里新增"恢复全部"选项，一键恢复所有被隐藏的纪念日</p>
+</div>
+
+<hr style="margin:20px 0;border-color:rgba(0,0,0,0.08)">
+
+<h3>需要确认的细节：</h3>
+
+<div class="options">
+  <div class="option" data-choice="toggle" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>底部按钮：点击切换</h3>
+      <p>点击"已隐藏 N 个"直接切换显示/隐藏已隐藏列表，简单直接</p>
+    </div>
+  </div>
+  <div class="option" data-choice="popup" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>底部按钮：弹出小菜单</h3>
+      <p>点击后弹出一个小列表，显示所有已隐藏的纪念日，逐个点击恢复</p>
+    </div>
+  </div>
+</div>
