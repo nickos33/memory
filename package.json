@@ -1,0 +1,64 @@
+{
+  "name": "memorial-day-reminder",
+  "version": "1.0.0",
+  "description": "纪念日提醒软件 - 记录并提醒重要纪念日",
+  "main": "main.mjs",
+  "scripts": {
+    "start": "ELECTRON_RUN_AS_NODE= webpack --config webpack.config.cjs && ELECTRON_RUN_AS_NODE= npm run pack && open \"release/mac-arm64/纪念日.app\"",
+    "dev": "ELECTRON_RUN_AS_NODE= webpack --config webpack.config.cjs --watch & ELECTRON_RUN_AS_NODE= npx electron .",
+    "build": "ELECTRON_RUN_AS_NODE= webpack --config webpack.config.cjs --mode production && ELECTRON_RUN_AS_NODE= npx electron-builder",
+    "pack": "ELECTRON_RUN_AS_NODE= npx electron-builder --dir"
+  },
+  "author": "",
+  "license": "MIT",
+  "build": {
+    "appId": "com.memorial.day-reminder",
+    "productName": "纪念日",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.mjs",
+      "main.cjs",
+      "preload.cjs",
+      "store.mjs",
+      "notifications.mjs",
+      "public/**",
+      "dist/**",
+      "package.json",
+      "icon.icns",
+      "icon.png",
+      "node_modules/**"
+    ],
+    "mac": {
+      "icon": "icon.icns",
+      "target": "dmg",
+      "category": "public.app-category.productivity"
+    },
+    "electronDownload": {
+      "mirror": "https://npmmirror.com/mirrors/electron/"
+    }
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "@babel/preset-react": "^7.29.7",
+    "babel-loader": "^9.2.1",
+    "css-loader": "^6.11.0",
+    "electron": "^28.2.0",
+    "electron-builder": "^24.13.3",
+    "style-loader": "^3.3.4",
+    "webpack": "^5.107.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "electron-store": "^8.2.0",
+    "lunar-typescript": "^1.8.6",
+    "node-cron": "^3.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
