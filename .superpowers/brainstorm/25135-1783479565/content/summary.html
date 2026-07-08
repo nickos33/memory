@@ -1,0 +1,47 @@
+<h2>设计概要 — 桌面常驻小组件</h2>
+<p class="subtitle">确认之前请检查各项配置</p>
+
+<div class="section">
+  <h3>形态</h3>
+  <p>桌面悬浮面板（保留 Dock 图标 app），毛玻璃风格，与主应用统一直角边框。</p>
+</div>
+
+<div class="section">
+  <h3>面板内容</h3>
+  <p>显示 3 个即将到来的纪念日，支持上下滚动查看更多。点击面板上的纪念日打开主窗口（编辑/查看详情）。</p>
+</div>
+
+<div class="section">
+  <h3>位置</h3>
+  <p>默认左上角，用户可拖拽到任意位置。</p>
+</div>
+
+<div class="section">
+  <h3>交互</h3>
+  <ul style="font-size:14px;color:var(--text-secondary);line-height:1.8;">
+    <li>点击面板 → 打开主应用</li>
+    <li>滚轮 → 滚动查看更多纪念日</li>
+    <li>拖拽 → 移动面板位置</li>
+    <li>右键 → 菜单（打开主窗口 / 隐藏面板 / 退出）</li>
+    <li>右下角拖拽 → 调整面板大小</li>
+  </ul>
+</div>
+
+<div class="section">
+  <h3>数据刷新</h3>
+  <p>实时同步（主应用增删改后通过 IPC 通知面板更新），同时每 30 秒读取 JSON 文件作为兜底。</p>
+</div>
+
+<div class="section">
+  <h3>状态保持</h3>
+  <p>位置和大小保存到本地文件，重启后恢复。</p>
+</div>
+
+<div class="section">
+  <h3>面板结构（每条纪念日）</h3>
+  <div style="display:flex;align-items:baseline;gap:8px;padding:6px 12px;font-size:14px;">
+    <span style="font-weight:700;">💒 结婚纪念日</span>
+    <span style="color:#4A6A8A;font-size:12px;">结婚</span>
+    <span style="margin-left:auto;font-weight:700;color:#4A6A8A;">还有 3 天</span>
+  </div>
+</div>
