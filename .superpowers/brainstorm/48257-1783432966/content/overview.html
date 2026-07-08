@@ -1,0 +1,88 @@
+<h2>纪念日提醒 — 当前状态 & 优化方向</h2>
+<p class="subtitle">先看看你现在有什么，再决定往哪个方向走</p>
+
+<div class="section">
+  <h3>当前状态梳理</h3>
+  <div class="mockup">
+    <div class="mockup-header">当前应用截图预览</div>
+    <div class="mockup-body">
+      <div style="background: #F5F5F5; padding: 20px; border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin:0;font-size:22px;">纪念日</h3>
+          <button style="background:#E53935;color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:600;">+ 新增</button>
+        </div>
+        <div style="background:white;border:1px solid #E0E0E0;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+          <span>🔍</span>
+          <span style="color:#9E9E9E;">搜索人名、事由或备注...</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="background:white;border-radius:12px;padding:16px;border-left:4px solid #EF5350;background:linear-gradient(135deg, white 0%, #FFEBEE 100%);">
+            <div style="display:flex;justify-content:space-between;">
+              <span>📌</span>
+              <div style="display:flex;gap:6px;">
+                <button style="border:1px solid #90CAF9;color:#1976D2;background:none;padding:4px 10px;border-radius:6px;font-size:12px;">编辑</button>
+                <button style="border:1px solid #FFCDD2;color:#E53935;background:none;padding:4px 10px;border-radius:6px;font-size:12px;">删除</button>
+              </div>
+            </div>
+            <div style="margin-top:8px;">
+              <span style="font-size:12px;color:#9E9E9E;">2026年07月07日</span>
+              <span style="font-size:10px;background:#FFCDD2;color:#E53935;padding:2px 6px;border-radius:10px;margin-left:6px;font-weight:700;">今天</span>
+            </div>
+            <div style="font-size:18px;font-weight:700;margin-top:4px;">妈妈</div>
+            <div style="font-size:14px;color:#1976D2;font-weight:500;">生日</div>
+            <div style="font-size:12px;color:#9E9E9E;margin-top:4px;">记得买蛋糕</div>
+          </div>
+          <div style="background:white;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="display:flex;justify-content:space-between;">
+              <span style="opacity:0.3;">📌</span>
+              <div style="display:flex;gap:6px;">
+                <button style="border:1px solid #90CAF9;color:#1976D2;background:none;padding:4px 10px;border-radius:6px;font-size:12px;">编辑</button>
+                <button style="border:1px solid #FFCDD2;color:#E53935;background:none;padding:4px 10px;border-radius:6px;font-size:12px;">删除</button>
+              </div>
+            </div>
+            <div style="margin-top:8px;"><span style="font-size:12px;color:#9E9E9E;">2025年12月25日</span></div>
+            <div style="font-size:18px;font-weight:700;margin-top:4px;">妻子</div>
+            <div style="font-size:14px;color:#1976D2;font-weight:500;">结婚纪念日</div>
+            <div style="font-size:12px;color:#9E9E9E;margin-top:4px;">一起去吃法餐</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>功能已完整，优化空间在哪？</h3>
+  <p class="subtitle">以下是可从"能用"升级到"好用/好看"的方向</p>
+
+  <div class="options">
+    <div class="option" data-choice="visual" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <h3>视觉风格升级</h3>
+        <p>更精致的配色、圆角、阴影、字体层次；现代设计风格（玻璃态/极简/新拟态等）</p>
+      </div>
+    </div>
+    <div class="option" data-choice="layout" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <h3>布局与交互优化</h3>
+        <p>卡片动画、hover 效果、拖拽排序、滑动删除、响应式适配、键盘快捷键</p>
+      </div>
+    </div>
+    <div class="option" data-choice="features" onclick="toggleSelect(this)">
+      <div class="letter">C</div>
+      <div class="content">
+        <h3>功能增强</h3>
+        <p>倒计时天数显示、农历日期、分类标签、导出/导入、iCloud 同步、纪念日倒数小组件</p>
+      </div>
+    </div>
+    <div class="option" data-choice="all" onclick="toggleSelect(this)">
+      <div class="letter">D</div>
+      <div class="content">
+        <h3>全面打磨（推荐）</h3>
+        <p>视觉 + 交互 + 功能三者兼顾，但分优先级，一步一个脚印打磨到"精致级"</p>
+      </div>
+    </div>
+  </div>
+</div>
