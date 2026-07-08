@@ -1,0 +1,33 @@
+<h2>桌面常驻小组件 — 形态选择</h2>
+<p class="subtitle">你希望小组件以什么形态常驻在桌面上？</p>
+
+<div class="options">
+  <div class="option" data-choice="floating-panel" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>悬浮面板</h3>
+      <p>一个半透明的小矩形面板，始终悬浮在桌面右上角（或自定义位置），显示最近 3-5 个纪念日。类似 macOS 的"便笺"或天气小组件。可拖拽移动。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="menu-bar" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>菜单栏图标</h3>
+      <p>在 macOS 菜单栏（顶部）显示一个图标，点击后弹出下拉面板显示纪念日。类似系统的时钟/WiFi 图标。最小化占用空间。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="dock-tile" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Dock 角标 + 菜单栏</h3>
+      <p>菜单栏图标为主要入口，同时 Dock 图标上显示临近天数角标（如"3天"）。适合强调提醒功能。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="both" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>两者都要</h3>
+      <p>桌面悬浮面板（主要）+ 菜单栏图标（快捷入口）。悬浮面板显示详细信息，菜单栏提供一键打开主窗口。</p>
+    </div>
+  </div>
+</div>
