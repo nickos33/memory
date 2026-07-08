@@ -1,0 +1,19 @@
+<h2>悬浮面板 — 状态保持</h2>
+<p class="subtitle">面板的位置和大小的状态如何保持？</p>
+
+<div class="options">
+  <div class="option" data-choice="persist" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>持久化到本地文件</h3>
+      <p>位置、大小保存到 JSON 文件。重启 app 后恢复上次的位置和大小</p>
+    </div>
+  </div>
+  <div class="option" data-choice="default" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>每次都回到默认位置</h3>
+      <p>每次启动都在左上角弹出，不保存位置。简单但每次都要手动调整</p>
+    </div>
+  </div>
+</div>
