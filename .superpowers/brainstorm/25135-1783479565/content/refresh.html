@@ -1,0 +1,26 @@
+<h2>悬浮面板 — 数据刷新</h2>
+<p class="subtitle">面板上的数据如何保持最新？</p>
+
+<div class="options">
+  <div class="option" data-choice="realtime" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>实时同步</h3>
+      <p>主应用增删改后，面板立即更新（通过 IPC 通知）。最快，但需要两个窗口通信</p>
+    </div>
+  </div>
+  <div class="option" data-choice="polling" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>定时刷新（每 30 秒读文件）</h3>
+      <p>面板定时读取 JSON 数据文件，简单可靠，无需窗口间通信。30 秒延迟可以接受</p>
+    </div>
+  </div>
+  <div class="option" data-choice="focus-refresh" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>聚焦时刷新</h3>
+      <p>当用户鼠标移入面板时自动刷新数据。省资源，但需要先触发才能看到最新</p>
+    </div>
+  </div>
+</div>
