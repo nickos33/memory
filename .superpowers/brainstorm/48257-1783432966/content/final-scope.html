@@ -1,0 +1,50 @@
+<h2>最终范围确认</h2>
+<p class="subtitle">已完成决策汇总，剩余 P3 项待确认</p>
+
+<div class="section">
+  <h3>已确定的设计决策</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:14px;">
+    <tr style="border-bottom:1px solid #E8E8ED;"><td style="padding:10px 14px;font-weight:600;color:#8A9EB0;width:140px;">风格</td><td style="padding:10px 14px;color:#3A5068;">混合方案 — 极简底 + 毛玻璃点缀</td></tr>
+    <tr style="border-bottom:1px solid #E8E8ED;"><td style="padding:10px 14px;font-weight:600;color:#8A9EB0;">背景</td><td style="padding:10px 14px;color:#3A5068;">清蓝柔和新变(晨雾湖面) + 毛玻璃卡片</td></tr>
+    <tr style="border-bottom:1px solid #E8E8ED;"><td style="padding:10px 14px;font-weight:600;color:#8A9EB0;">强调色</td><td style="padding:10px 14px;color:#3A5068;">蓝色系 #007AFF 统一替代红色</td></tr>
+    <tr style="border-bottom:1px solid #E8E8ED;"><td style="padding:10px 14px;font-weight:600;color:#8A9EB0;">按钮</td><td style="padding:10px 14px;color:#3A5068;">Hover 悬浮菜单，平时隐藏</td></tr>
+    <tr style="border-bottom:1px solid #E8E8ED;"><td style="padding:10px 14px;font-weight:600;color:#8A9EB0;">倒计时</td><td style="padding:10px 14px;color:#3A5068;">日期行右侧内嵌显示</td></tr>
+    <tr style="border-bottom:1px solid #E8E8ED;"><td style="padding:10px 14px;font-weight:600;color:#8A9EB0;">动效</td><td style="padding:10px 14px;color:#3A5068;">丰富过渡动画(入场/删除/置顶/毛玻璃)</td></tr>
+    <tr style="border-bottom:1px solid #E8E8ED;"><td style="padding:10px 14px;font-weight:600;color:#8A9EB0;">拖拽</td><td style="padding:10px 14px;color:#3A5068;">✅ 拖拽排序, 集成 dnd-kit</td></tr>
+    <tr><td style="padding:10px 14px;font-weight:600;color:#8A9EB0;">键盘</td><td style="padding:10px 14px;color:#3A5068;">❌ 不需要快捷键</td></tr>
+  </table>
+</div>
+
+<div class="section" style="margin-top:20px;">
+  <h3>P3 锦上添花 — 本次包含还是后续？</h3>
+  <div class="options" data-multiselect>
+    <div class="option" data-choice="lunar" onclick="toggleSelect(this)">
+      <div class="letter">🌙</div>
+      <div class="content">
+        <h3>农历支持</h3>
+        <p>农历日期显示 + 农历生日自动推算次年日期</p>
+      </div>
+    </div>
+    <div class="option" data-choice="tags" onclick="toggleSelect(this)">
+      <div class="letter">🏷️</div>
+      <div class="content">
+        <h3>分类标签</h3>
+        <p>自定义标签(家庭/工作/朋友) + 筛选</p>
+      </div>
+    </div>
+    <div class="option" data-choice="export" onclick="toggleSelect(this)">
+      <div class="letter">📤</div>
+      <div class="content">
+        <h3>数据导出/导入</h3>
+        <p>JSON 备份导出, 跨设备迁移</p>
+      </div>
+    </div>
+    <div class="option" data-choice="defer-all" onclick="toggleSelect(this)">
+      <div class="letter">⏭️</div>
+      <div class="content">
+        <h3>全部放到以后</h3>
+        <p>本次只做视觉+交互优化( P0-P2 ), P3 下个版本</p>
+      </div>
+    </div>
+  </div>
+</div>
