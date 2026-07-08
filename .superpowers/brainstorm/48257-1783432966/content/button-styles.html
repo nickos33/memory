@@ -1,0 +1,83 @@
+<h2>卡片按钮优化 — 三种低调方案</h2>
+<p class="subtitle">编辑/删除不再抢眼，只在需要时出现</p>
+
+<div class="split">
+  <!-- 方案A: hover 显示 -->
+  <div style="background:linear-gradient(180deg, #E6EDF5 0%, #EEF2F8 40%, #EDF2F7 100%);padding:18px 14px;border-radius:16px;">
+    <h4 style="margin:0 0 10px;color:#6B8299;font-size:12px;text-align:center;letter-spacing:2px;">A · Hover 才显示</h4>
+
+    <div style="backdrop-filter:blur(14px);background:rgba(255,255,255,0.72);border:1px solid rgba(255,255,255,0.85);border-radius:16px;padding:16px 18px;border-left:3px solid #007AFF;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:15px;">📌</span>
+        <div style="display:flex;gap:4px;opacity:0;transition:opacity 0.2s;">⋮</div>
+      </div>
+      <div style="margin-top:6px;"><span style="font-size:12px;color:#8A9EB0;">2026年7月7日</span> <span style="font-size:10px;background:rgba(0,122,255,0.1);color:#007AFF;padding:2px 8px;border-radius:8px;margin-left:6px;">今天</span></div>
+      <div style="font-size:19px;font-weight:700;color:#3A5068;margin-top:4px;">妈妈</div>
+      <div style="font-size:13px;color:#007AFF;font-weight:500;">生日</div>
+    </div>
+    <div style="backdrop-filter:blur(14px);background:rgba(255,255,255,0.72);border:1px solid rgba(255,255,255,0.85);border-radius:16px;padding:16px 18px;position:relative;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:15px;opacity:0.25;">📌</span>
+        <div style="display:flex;gap:4px;background:rgba(255,255,255,0.95);padding:3px 6px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.04);">
+          <button style="border:none;background:none;color:#007AFF;font-size:12px;padding:3px 8px;cursor:pointer;border-radius:8px;">编辑</button>
+          <button style="border:none;background:none;color:#FF3B30;font-size:12px;padding:3px 8px;cursor:pointer;border-radius:8px;">删除</button>
+        </div>
+      </div>
+      <div style="margin-top:6px;"><span style="font-size:12px;color:#8A9EB0;">2025年12月25日</span></div>
+      <div style="font-size:19px;font-weight:700;color:#3A5068;margin-top:4px;">妻子</div>
+      <div style="font-size:13px;color:#007AFF;font-weight:500;">结婚纪念日</div>
+      <div style="position:absolute;right:18px;bottom:16px;font-size:11px;color:#90A8BB;">← hover 出现悬浮菜单</div>
+    </div>
+    <div style="font-size:10px;color:#90A8BB;text-align:center;margin-top:10px;">默认隐藏，hover 卡片时右上角出现「⋮」菜单</div>
+  </div>
+
+  <!-- 方案B: 纯图标 -->
+  <div style="background:linear-gradient(180deg, #E6EDF5 0%, #EEF2F8 40%, #EDF2F7 100%);padding:18px 14px;border-radius:16px;">
+    <h4 style="margin:0 0 10px;color:#6B8299;font-size:12px;text-align:center;letter-spacing:2px;">B · 纯图标无文字</h4>
+
+    <div style="backdrop-filter:blur(14px);background:rgba(255,255,255,0.72);border:1px solid rgba(255,255,255,0.85);border-radius:16px;padding:16px 18px;border-left:3px solid #007AFF;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:15px;">📌</span>
+        <div style="display:flex;gap:2px;">
+          <button style="border:none;background:none;font-size:15px;padding:4px 6px;cursor:pointer;opacity:0.35;border-radius:8px;" title="编辑">✎</button>
+          <button style="border:none;background:none;font-size:15px;padding:4px 6px;cursor:pointer;opacity:0.35;border-radius:8px;" title="删除">✕</button>
+        </div>
+      </div>
+      <div style="margin-top:6px;"><span style="font-size:12px;color:#8A9EB0;">2026年7月7日</span> <span style="font-size:10px;background:rgba(0,122,255,0.1);color:#007AFF;padding:2px 8px;border-radius:8px;margin-left:6px;">今天</span></div>
+      <div style="font-size:19px;font-weight:700;color:#3A5068;margin-top:4px;">妈妈</div>
+      <div style="font-size:13px;color:#007AFF;font-weight:500;">生日</div>
+    </div>
+    <div style="backdrop-filter:blur(14px);background:rgba(255,255,255,0.72);border:1px solid rgba(255,255,255,0.85);border-radius:16px;padding:16px 18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:15px;opacity:0.25;">📌</span>
+        <div style="display:flex;gap:2px;">
+          <button style="border:none;background:none;font-size:15px;padding:4px 6px;cursor:pointer;opacity:0.25;border-radius:8px;" title="编辑">✎</button>
+          <button style="border:none;background:none;font-size:15px;padding:4px 6px;cursor:pointer;opacity:0.25;border-radius:8px;" title="删除">✕</button>
+        </div>
+      </div>
+      <div style="margin-top:6px;"><span style="font-size:12px;color:#8A9EB0;">2025年12月25日</span></div>
+      <div style="font-size:19px;font-weight:700;color:#3A5068;margin-top:4px;">妻子</div>
+      <div style="font-size:13px;color:#007AFF;font-weight:500;">结婚纪念日</div>
+    </div>
+    <div style="font-size:10px;color:#90A8BB;text-align:center;margin-top:10px;">始终显示但极淡，hover 加深</div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:20px;">
+  <div class="options">
+    <div class="option" data-choice="hover-menu" onclick="toggleSelect(this)">
+      <div class="letter">A</div>
+      <div class="content">
+        <h3>Hover 悬浮菜单</h3>
+        <p>平时看不到按钮，鼠标移上去才出现。最干净</p>
+      </div>
+    </div>
+    <div class="option" data-choice="icon-only" onclick="toggleSelect(this)">
+      <div class="letter">B</div>
+      <div class="content">
+        <h3>纯图标极淡显示</h3>
+        <p>始终可见但极淡(25% 透明度)，hover 加深到 70%</p>
+      </div>
+    </div>
+  </div>
+</div>
