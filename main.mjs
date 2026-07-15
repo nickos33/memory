@@ -5,6 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { initNotifications, checkUpcoming } from './notifications.mjs';
 import * as store from './store.mjs';
+import { getLoginItemOptions, shouldOpenMainWindow } from './src/shared/startup-mode.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,6 +14,28 @@ let widgetWindow;
 let forceQuitting = false;
 
 const WIDGET_CONFIG = path.join(app.getPath('userData'), 'widget-config.json');
+
+function isTrustedRendererUrl(url) {
+  try {
+    const filePath = fileURLToPath(url);
+    const publicRoot = path.join(__dirname, 'public') + path.sep;
+    return filePath.startsWith(publicRoot);
+  } catch (_) {
+    return false;
+  }
+}
+
+function assertTrustedSender(event) {
+  const senderUrl = event.senderFrame?.url || '';
+  if (!isTrustedRendererUrl(senderUrl)) throw new Error('拒绝来自未知页面的请求');
+}
+
+function trustedHandle(channel, handler) {
+  ipcMain.handle(channel, (event, ...args) => {
+    assertTrustedSender(event);
+    return handler(...args);
+  });
+}
 
 function loadWidgetConfig() {
   try {
@@ -23,6 +46,10 @@ function loadWidgetConfig() {
 
 function saveWidgetConfig(cfg) {
   fs.writeFileSync(WIDGET_CONFIG, JSON.stringify(cfg, null, 2), 'utf-8');
+}
+
+function updateWidgetConfig(patch) {
+  saveWidgetConfig({ ...loadWidgetConfig(), ...patch });
 }
 
 function createWindow() {
@@ -37,17 +64,41 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
+      sandbox: true,
     },
   });
 
   mainWindow.loadFile(path.join(__dirname, 'public', 'index.html'));
+  mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (!isTrustedRendererUrl(url)) event.preventDefault();
+  });
+
+  mainWindow.on('close', (event) => {
+    if (!forceQuitting) {
+      event.preventDefault();
+      mainWindow.hide();
+    }
+  });
+
+  mainWindow.on('closed', () => { mainWindow = null; });
+}
+
+function showMainWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) createWindow();
+  mainWindow.show();
+  mainWindow.focus();
+  return mainWindow;
 }
 
 function createWidget(forceVisible) {
   const cfg = loadWidgetConfig();
   if (!cfg.visible && !forceVisible) return;
 
-  if (forceVisible) cfg.visible = true;
+  if (forceVisible) {
+    cfg.visible = true;
+    saveWidgetConfig(cfg);
+  }
 
   widgetWindow = new BrowserWindow({
     x: cfg.x,
@@ -74,10 +125,15 @@ function createWidget(forceVisible) {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
+      sandbox: true,
     },
   });
 
   widgetWindow.loadFile(path.join(__dirname, 'public', 'widget.html'));
+  widgetWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  widgetWindow.webContents.on('will-navigate', (event, url) => {
+    if (!isTrustedRendererUrl(url)) event.preventDefault();
+  });
   widgetWindow.setVisibleOnAllWorkspaces(true);
   widgetWindow.setAlwaysOnTop(true, 'floating');
 
@@ -96,12 +152,13 @@ function createWidget(forceVisible) {
   // Right-click context menu
   widgetWindow.webContents.on('context-menu', () => {
     Menu.buildFromTemplate([
-      { label: '打开主窗口', click: () => { if (mainWindow) { mainWindow.show(); mainWindow.focus(); } } },
+      { label: '打开主窗口', click: showMainWindow },
       { label: '恢复全部隐藏', click: () => { widgetWindow.webContents.send('widget:restoreAll'); } },
       { type: 'separator' },
       { label: '隐藏面板', click: () => {
         if (widgetWindow && !widgetWindow.isDestroyed()) {
           widgetWindow.hide();
+          updateWidgetConfig({ visible: false });
         }
       }},
       { type: 'separator' },
@@ -119,24 +176,28 @@ function notifyWidgetRefresh() {
 }
 
 app.whenReady().then(() => {
-  createWindow();
-  createWidget();
-  initNotifications(mainWindow);
+  try {
+    app.setLoginItemSettings(getLoginItemOptions());
+  } catch (error) {
+    console.error('注册开机启动失败:', error);
+  }
+
+  let loginSettings = {};
+  try {
+    loginSettings = app.getLoginItemSettings();
+  } catch (error) {
+    console.error('读取开机启动状态失败:', error);
+  }
+
+  if (shouldOpenMainWindow(loginSettings)) showMainWindow();
+  createWidget(true);
+  initNotifications(showMainWindow);
   checkUpcoming();
 
-  try { app.setLoginItemSettings({ openAtLogin: true }); } catch (_) {}
-
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    showMainWindow();
   });
   app.on('before-quit', () => { forceQuitting = true; });
-
-  mainWindow.on('close', (e) => {
-    if (!forceQuitting) {
-      e.preventDefault();
-      mainWindow.hide();
-    }
-  });
 });
 
 app.on('window-all-closed', () => {
@@ -151,64 +212,79 @@ app.on('before-quit', () => {
 });
 
 // Widget IPC
-ipcMain.handle('widget:openMain', () => {
-  if (mainWindow) { mainWindow.show(); mainWindow.focus(); }
+trustedHandle('widget:openMain', () => {
+  showMainWindow();
 });
 
-ipcMain.handle('widget:move', (_event, dx, dy) => {
+trustedHandle('widget:move', (dx, dy) => {
+  if (!Number.isFinite(dx) || !Number.isFinite(dy) || Math.abs(dx) > 1000 || Math.abs(dy) > 1000) {
+    throw new Error('无效的小组件移动距离');
+  }
   if (widgetWindow && !widgetWindow.isDestroyed()) {
     const [x, y] = widgetWindow.getPosition();
     widgetWindow.setPosition(x + dx, y + dy);
   }
 });
 
-ipcMain.handle('widget:showWidget', () => {
+trustedHandle('widget:showWidget', () => {
   if (!widgetWindow || widgetWindow.isDestroyed()) {
     createWidget(true);
   } else {
     widgetWindow.show();
     widgetWindow.focus();
+    updateWidgetConfig({ visible: true });
   }
 });
 
-ipcMain.handle('widget:hideWidget', () => {
+trustedHandle('widget:hideWidget', () => {
   if (widgetWindow && !widgetWindow.isDestroyed()) {
     widgetWindow.hide();
+    updateWidgetConfig({ visible: false });
   }
 });
 
-ipcMain.handle('widget:toggleWidget', () => {
+trustedHandle('widget:toggleWidget', () => {
   if (!widgetWindow || widgetWindow.isDestroyed()) {
     createWidget(true);
   } else if (widgetWindow.isVisible()) {
     widgetWindow.hide();
+    updateWidgetConfig({ visible: false });
   } else {
     widgetWindow.show();
     widgetWindow.focus();
+    updateWidgetConfig({ visible: true });
   }
 });
 
 // Memorial CRUD IPC
-ipcMain.handle('memorial:getAll', () => store.getAll());
-ipcMain.handle('memorial:add', (_event, memorial) => {
+trustedHandle('memorial:getAll', () => store.getAll());
+trustedHandle('memorial:add', (memorial) => {
   const result = store.add(memorial);
   notifyWidgetRefresh();
   return result;
 });
-ipcMain.handle('memorial:update', (_event, { id, data }) => {
+trustedHandle('memorial:update', ({ id, data } = {}) => {
   const result = store.update(id, data);
   notifyWidgetRefresh();
   return result;
 });
-ipcMain.handle('memorial:delete', (_event, id) => {
+trustedHandle('memorial:delete', (id) => {
   const result = store.remove(id);
   notifyWidgetRefresh();
   return result;
 });
-ipcMain.handle('memorial:togglePin', (_event, id) => store.togglePin(id));
-ipcMain.handle('memorial:reorder', (_event, ids) => store.reorder(ids));
+trustedHandle('memorial:togglePin', (id) => {
+  const result = store.togglePin(id);
+  notifyWidgetRefresh();
+  return result;
+});
+trustedHandle('memorial:reorder', (ids) => {
+  const result = store.reorder(ids);
+  notifyWidgetRefresh();
+  return result;
+});
 
-ipcMain.handle('memorial:exportData', async () => {
+trustedHandle('memorial:exportData', async () => {
   const { filePath } = await dialog.showSaveDialog(mainWindow, {
     title: '导出纪念日数据',
     defaultPath: `memorials-backup-${new Date().toISOString().slice(0, 10)}.json`,
@@ -221,7 +297,7 @@ ipcMain.handle('memorial:exportData', async () => {
   return false;
 });
 
-ipcMain.handle('memorial:importData', async () => {
+trustedHandle('memorial:importData', async () => {
   const { filePaths } = await dialog.showOpenDialog(mainWindow, {
     title: '导入纪念日数据',
     filters: [{ name: 'JSON', extensions: ['json'] }],

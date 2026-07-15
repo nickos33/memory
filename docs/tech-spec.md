@@ -1,169 +1,77 @@
 # 技术规格说明书
 
-> 版本 v1.0.0 | 最后更新 2026-07-08
+> 版本 v2.1.0 | 最后更新 2026-07-15
 
 ## 技术栈
 
-| 层级 | 技术 | 版本 |
-|------|------|------|
-| 桌面运行时 | Electron | 28.2.0 |
-| UI 框架 | React | ^18.3 |
-| 样式 | 纯 CSS（毛玻璃主题） | — |
-| 打包 | webpack 5 | ^5.107 |
-| 数据存储 | JSON 文件（手动读写） | — |
-| 定时任务 | node-cron | ^3.0 |
-| 农历 | lunar-typescript | ^1.8.6 |
-| 拖拽排序 | @dnd-kit/core + @dnd-kit/sortable | ^6.3 / ^10.0 |
-| 编译 | Babel | ^7.29 |
-| 打包分发 | electron-builder | ^24.13 |
+Electron 28.2、React 18.3、Webpack 5、Node cron、lunar-typescript、@dnd-kit 和 electron-builder。应用完全离线，数据位于 Electron `userData` 目录。
 
-## 架构
+## 运行架构
 
-```
-┌──────────────────────────────────┐
-│         Electron Main            │
-│  ┌──────────┐  ┌──────────────┐  │
-│  │  Store   │  │ Notifications│  │
-│  │ (JSON)   │  │  (cron+API)  │  │
-│  └──────────┘  └──────────────┘  │
-│         │ IPC (preload) │         │
-├─────────┼───────────────┼─────────┤
-│         ▼               ▼         │
-│       Electron Renderer          │
-│  ┌────────────────────────────┐  │
-│  │        React App           │  │
-│  │  ┌──────┐ ┌────────────┐   │  │
-│  │  │Card  │ │AddEditForm │   │  │
-│  │  │List  │ │   + Modal  │   │  │
-│  │  └──────┘ └────────────┘   │  │
-│  │  ┌──────────┐ ┌─────────┐  │  │
-│  │  │SearchBar │ │Confirm  │  │  │
-│  │  └──────────┘ └─────────┘  │  │
-│  └────────────────────────────┘  │
-└──────────────────────────────────┘
-```
+- `main.mjs`：唯一 Electron 主进程入口，管理主窗口、小组件、IPC、系统通知和登录项。
+- `preload.cjs`：在隔离上下文中暴露 `memorialAPI`、`widgetAPI`。
+- `store.mjs`：严格读取、上一版备份、临时文件写入和原子替换。
+- `notifications.mjs`：每天 9:00 调度提醒。
+- `src/shared/memorial-date.mjs`：公历、农历和下一次发生日期的唯一规则来源。
+- `src/shared/memorial-data.mjs`：记录规范化、校验、局部重排和导入合并。
+- `src/shared/startup-mode.mjs`：登录项默认配置和静默启动判断。
+- `src/renderer/`：主窗口和悬浮小组件 React 界面。
 
-## 项目结构
+## 启动模式
 
-```
-纪念日/
-├── main.mjs              # Electron 主进程入口（ESM）
-├── main.cjs              # Electron 主进程入口（CJS 备用）
-├── preload.cjs           # 预加载脚本（contextBridge）
-├── notifications.mjs     # 通知模块（node-cron 定时提醒）
-├── store.mjs             # 数据存储模块（JSON 读写）
-├── webpack.config.cjs    # Webpack 构建配置
-├── package.json          # 项目配置 & electron-builder 打包配置
-├── public/
-│   └── index.html        # HTML 入口
-├── src/renderer/
-│   ├── index.js          # React 入口
-│   ├── App.js            # 根组件
-│   ├── App.css           # 全局样式
-│   ├── utils/
-│   │   └── helpers.js    # 工具函数
-│   └── components/
-│       ├── AddEditForm.js   # 新增/编辑表单弹窗
-│       ├── Card.js          # 纪念日卡片（含拖拽）
-│       ├── CardList.js      # 卡片列表（dnd-kit）
-│       ├── ConfirmDialog.js # 删除确认弹窗
-│       ├── ExportImportBar.js # 导出/导入工具栏
-│       └── SearchBar.js     # 搜索栏 + 标签筛选
-├── dist/                 # Webpack 构建输出
-├── release/              # electron-builder 打包输出
-└── dev-logs/             # 开发日志
-```
+- 每次启动都确保 `openAtLogin: true`，不在主界面提供关闭按钮。
+- `wasOpenedAtLogin: true` 时不创建主窗口，只显示桌面小组件。
+- 手动启动、Dock 激活、小组件操作和通知点击通过同一入口按需创建并显示主窗口。
+- 登录项注册失败只记录错误，不阻断应用运行。
 
 ## 数据模型
 
-### memorials.json 数据结构
-
 ```json
-[
-  {
-    "id": "lxyz123abc45",
-    "name": "结婚纪念日",
-    "date": "2024-05-20",
-    "reason": "结婚",
-    "notes": "",
-    "tags": ["家庭"],
-    "isLunar": false,
-    "_lunarNextDate": "2026-06-15T00:00:00Z",
-    "pinned": false,
-    "order": 0,
-    "createdAt": "2026-01-01T00:00:00.000Z",
-    "updatedAt": "2026-07-08T00:00:00.000Z"
-  }
-]
+{
+  "id": "lxyz123abc45",
+  "name": "妈妈",
+  "date": "1990-03-08",
+  "reason": "生日",
+  "notes": "",
+  "tags": ["家庭"],
+  "isLunar": false,
+  "recurrence": "yearly",
+  "pinned": false,
+  "order": 0,
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "updatedAt": "2026-07-14T00:00:00.000Z"
+}
 ```
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `id` | string | 唯一标识（36进制时间戳 + 5位随机） |
-| `name` | string | 纪念日名称/人名 |
-| `date` | string | 日期 YYYY-MM-DD |
-| `reason` | string | 纪念类型（预设或自定义） |
-| `notes` | string | 备注（可选） |
-| `tags` | string[] | 标签列表 |
-| `isLunar` | boolean | 是否农历日期 |
-| `_lunarNextDate` | string | 农历下次对应的公历日期（运行时计算） |
-| `pinned` | boolean | 是否置顶 |
-| `order` | number | 拖拽排序序号 |
-| `createdAt` | string | 创建时间 ISO |
-| `updatedAt` | string | 更新时间 ISO |
+农历记录额外保存 `lunarYear`、`lunarMonth`、`lunarDay`、`lunarLeap`。旧记录没有 `recurrence` 时按 `yearly` 规范化；旧农历记录从 `date` 推导农历字段。
 
-### 排序规则
+## 日期规则
 
-1. 置顶的纪念日排在最前面
-2. 拖拽排序后写入 `order` 字段，同 pin 状态下按 order 升序
-3. 新创建的纪念日 order 为 0
+- `yearly` 公历记录取当前或下一年的同月同日。
+- 2 月 29 日在非闰年取 2 月 28 日。
+- `yearly` 农历记录逐年换算到下一次公历日期，支持闰月。
+- `once` 保留原完整日期，过期后显示“已过 N 天”。
+- 主窗口、小组件排序和系统通知共用同一个计算模块。
 
-## IPC 接口
+## 数据安全
 
-所有接口通过 `window.memorialAPI`（preload contextBridge）暴露给渲染进程。
+- 文件不存在时返回空列表；解析或结构错误时抛错并禁止覆盖。
+- 每次覆盖前复制为 `memorials.json.bak`。
+- 新数据先写同目录临时文件，再通过 `rename` 原子替换。
+- 导入逐条校验，任一记录无效即拒绝整次导入。
+- 局部拖拽只更新参与记录的顺序，永不删除未显示记录。
 
-| 方法 | 参数 | 返回值 | 说明 |
-|------|------|--------|------|
-| `memorialAPI.getAll()` | 无 | `Array` | 获取全部纪念日 |
-| `memorialAPI.add(data)` | `{name, date, reason, ...}` | `Object` | 新增纪念日 |
-| `memorialAPI.update(id, data)` | `id, {...}` | `Object` | 更新纪念日 |
-| `memorialAPI.delete(id)` | `id` | `boolean` | 删除纪念日 |
-| `memorialAPI.togglePin(id)` | `id` | `Object` | 切换置顶状态 |
-| `memorialAPI.reorder(ids)` | `[id1, id2, ...]` | `Array` | 拖拽排序后更新顺序 |
-| `memorialAPI.exportData()` | 无 | `boolean` | 导出 JSON 备份文件 |
-| `memorialAPI.importData()` | 无 | `number` | 导入 JSON 备份文件（返回新记录数） |
+## 安全边界
 
-## 通知规则
+- `contextIsolation: true`、`nodeIntegration: false`、`sandbox: true`。
+- CSP 只允许本地脚本与样式；禁止外部连接、对象和表单提交。
+- 禁止创建新窗口和跳转到非 `file://` 地址。
+- IPC 仅接受本地 renderer，并在存储层继续校验数据结构。
 
-- 每天早上 9:00 检查（node-cron `0 9 * * *`）
-- 当天 → "就是今天！"
-- 提前 1 天 → "提前一天提醒"
-- 提前 3 天 → "提前三天提醒"
-- 提前 7 天 → "提前一周提醒"
-- 点击通知打开主窗口
-
-## 安全
-
-- `contextIsolation: true`：渲染进程无法直接访问 Node.js
-- `nodeIntegration: false`：禁用 Node 集成
-- 通过 `preload.cjs` + `contextBridge` 暴露有限 API
-
-## 图标
-
-- 源文件：`IMG_6850.JPG`（1279×1604 竖版照片）
-- 处理方式：居中裁剪 → 1024×1024 方形 → 72 DPI
-- 生成 `.icns`：`iconutil -c icns`
-- **不调用 `app.dock.setIcon()`**（会导致 Dock 图标变大），依赖 `CFBundleIconFile` 自动加载
-
-## 开发命令
+## 验证命令
 
 ```bash
-npm start       # 构建 + 打包 + 打开 app
-npm run build   # 生产构建 + 打包 .dmg
-npm run pack    # 仅打包（不生成安装包）
+npm test
+npm start
+npm run build
 ```
-
-## 已知问题
-
-- `ELECTRON_RUN_AS_NODE=1` 环境变量阻止 electron 二进制下载，安装前需 `unset`
-- `node_modules/electron/index.js` 遮蔽 Electron 内置模块，开发时用 `npm start`（构建+打包）代替 `npx electron .`

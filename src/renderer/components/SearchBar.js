@@ -18,11 +18,12 @@ export default function SearchBar({ value, onChange, selectedTags, onTagsChange,
         <input
           type="text"
           placeholder="搜索人名、事由..."
+          aria-label="搜索人名、事由或备注"
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
         {value && (
-          <button className="search-clear" onClick={() => onChange('')}>✕</button>
+          <button className="search-clear" onClick={() => onChange('')} aria-label="清空搜索">✕</button>
         )}
       </div>
       <div className="tag-filter">
@@ -31,10 +32,11 @@ export default function SearchBar({ value, onChange, selectedTags, onTagsChange,
             key={tag}
             className={`tag-filter-chip ${selectedTags.includes(tag) ? 'active' : ''}`}
             onClick={() => toggleTag(tag)}
+            aria-pressed={selectedTags.includes(tag)}
           >
             {tag}
-            {onDeleteTag && (
-              <span className="tag-delete" onClick={(e) => { e.stopPropagation(); onDeleteTag(tag); }}>×</span>
+            {onDeleteTag && !DEFAULT_TAGS.includes(tag) && (
+              <span className="tag-delete" role="button" aria-label={`删除标签 ${tag}`} onClick={(e) => { e.stopPropagation(); onDeleteTag(tag); }}>×</span>
             )}
           </button>
         ))}

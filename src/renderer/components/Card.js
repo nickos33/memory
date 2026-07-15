@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { formatDate, daysSinceText } from '../utils/helpers.js';
+import { formatMemorialDate, getOccurrenceText } from '../utils/helpers.js';
 
 export default function Card({ item, onEdit, onDelete, onTogglePin }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
@@ -12,7 +12,7 @@ export default function Card({ item, onEdit, onDelete, onTogglePin }) {
     transition,
   };
 
-  const { text: countdownText, isSoon } = daysSinceText(item.date);
+  const { text: countdownText, isSoon, nextDate } = getOccurrenceText(item);
 
   return (
     <div
@@ -28,20 +28,21 @@ export default function Card({ item, onEdit, onDelete, onTogglePin }) {
             className={`btn-pin ${item.pinned ? 'pinned' : ''}`}
             onClick={(e) => { e.stopPropagation(); onTogglePin(); }}
             title={item.pinned ? '取消置顶' : '置顶'}
+            aria-label={item.pinned ? '取消置顶' : '置顶'}
           >
             📌
           </button>
-          <button className="btn-icon-edit" onClick={(e) => { e.stopPropagation(); onEdit(); }} title="编辑">
+          <button className="btn-icon-edit" onClick={(e) => { e.stopPropagation(); onEdit(); }} title="编辑" aria-label="编辑纪念日">
             ✎
           </button>
-          <button className="btn-icon-delete" onClick={(e) => { e.stopPropagation(); onDelete(); }} title="删除">
+          <button className="btn-icon-delete" onClick={(e) => { e.stopPropagation(); onDelete(); }} title="删除" aria-label="删除纪念日">
             ✕
           </button>
         </div>
       </div>
       <div className="card-date-row">
         <span className="card-date-text">
-          {formatDate(item.date, item.isLunar)}
+          {formatMemorialDate(item)}
         </span>
         {isSoon && <span className="card-date-badge">{countdownText}</span>}
         <span className={`card-countdown ${isSoon ? 'card-countdown-soon' : ''}`}>
@@ -50,6 +51,8 @@ export default function Card({ item, onEdit, onDelete, onTogglePin }) {
       </div>
       <h3 className="card-name">{item.name}</h3>
       <p className="card-reason">{item.reason}</p>
+      <p className="card-next-date">下次：{nextDate.toLocaleDateString('zh-CN')}</p>
+      {item.notes && <p className="card-notes">{item.notes}</p>}
       {item.tags && item.tags.length > 0 && (
         <div className="card-tags">
           {item.tags.map((tag) => (

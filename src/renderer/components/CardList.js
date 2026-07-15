@@ -13,8 +13,9 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import Card from './Card.js';
+import { formatMemorialDate } from '../utils/helpers.js';
 
-export default function CardList({ items, onEdit, onDelete, onTogglePin, onReorder }) {
+export default function CardList({ items, onEdit, onDelete, onTogglePin, onReorder, emptyMessage }) {
   const [activeId, setActiveId] = React.useState(null);
   const activeItem = items.find((m) => m.id === activeId);
 
@@ -29,6 +30,10 @@ export default function CardList({ items, onEdit, onDelete, onTogglePin, onReord
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
+    const source = items.find((entry) => entry.id === active.id);
+    const target = items.find((entry) => entry.id === over.id);
+    if (!source || !target || Boolean(source.pinned) !== Boolean(target.pinned)) return;
+
     const oldIndex = items.findIndex((m) => m.id === active.id);
     const newIndex = items.findIndex((m) => m.id === over.id);
     const reordered = [...items];
@@ -41,8 +46,8 @@ export default function CardList({ items, onEdit, onDelete, onTogglePin, onReord
     return (
       <div className="empty-state">
         <div className="empty-icon">📅</div>
-        <p>还没有纪念日</p>
-        <p className="empty-sub">点击右上角「+ 新增」添加第一个吧</p>
+        <p>{emptyMessage || '还没有纪念日'}</p>
+        {!emptyMessage && <p className="empty-sub">点击右上角「+ 新增」添加第一个吧</p>}
       </div>
     );
   }
@@ -75,7 +80,7 @@ export default function CardList({ items, onEdit, onDelete, onTogglePin, onReord
             </div>
             <div className="card-body">
               <div className="card-date-row">
-                <span className="card-date-text">{formatDate(activeItem.date, activeItem.isLunar)}</span>
+                <span className="card-date-text">{formatMemorialDate(activeItem)}</span>
               </div>
               <h3 className="card-name">{activeItem.name}</h3>
               <p className="card-reason">{activeItem.reason}</p>
@@ -85,10 +90,4 @@ export default function CardList({ items, onEdit, onDelete, onTogglePin, onReord
       </DragOverlay>
     </DndContext>
   );
-}
-
-function formatDate(dateStr, isLunar) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr);
-  return `${d.getFullYear()}年${String(d.getMonth()+1).padStart(2,'0')}月${String(d.getDate()).padStart(2,'0')}日`;
 }

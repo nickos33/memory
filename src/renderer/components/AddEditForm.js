@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
-import { DEFAULT_TAGS, DEFAULT_REASONS } from '../utils/helpers.js';
+import React, { useEffect, useState } from 'react';
+import {
+  DEFAULT_TAGS,
+  DEFAULT_REASONS,
+  deriveLunarFields,
+  formatDateOnly,
+  lunarDateToSolar,
+} from '../utils/helpers.js';
+
+const todayValue = () => formatDateOnly(new Date());
 
 export default function AddEditForm({ item, onSave, onClose }) {
+  const fallbackLunar = deriveLunarFields(item?.date || todayValue());
   const [reasons, setReasons] = useState(() => {
     const base = [...DEFAULT_REASONS];
     if (item?.reason && !base.includes(item.reason)) base.push(item.reason);
@@ -9,190 +18,204 @@ export default function AddEditForm({ item, onSave, onClose }) {
   });
   const [tags, setTags] = useState(() => {
     const base = [...DEFAULT_TAGS];
-    if (item?.tags) item.tags.forEach((t) => { if (!base.includes(t)) base.push(t); });
+    if (item?.tags) item.tags.forEach((tag) => { if (!base.includes(tag)) base.push(tag); });
     return base;
   });
   const [tagInput, setTagInput] = useState('');
   const [reasonInput, setReasonInput] = useState('');
-
+  const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState({});
   const [form, setForm] = useState({
     name: item?.name || '',
-    date: item?.date || '',
+    date: item?.date || todayValue(),
     reason: item?.reason || '生日',
     notes: item?.notes || '',
-    isLunar: item?.isLunar || false,
+    isLunar: Boolean(item?.isLunar),
+    recurrence: item?.recurrence || 'yearly',
+    lunarYear: item?.lunarYear || fallbackLunar.lunarYear,
+    lunarMonth: item?.lunarMonth || fallbackLunar.lunarMonth,
+    lunarDay: item?.lunarDay || fallbackLunar.lunarDay,
+    lunarLeap: Boolean(item?.lunarLeap ?? fallbackLunar.lunarLeap),
     selectedTags: item?.tags || [],
   });
-  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape' && !saving) onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose, saving]);
 
   const handleChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: '' }));
+    setForm((previous) => ({ ...previous, [field]: value }));
+    setErrors((previous) => ({ ...previous, [field]: '', submit: '' }));
   };
 
   const toggleTag = (tag) => {
-    setForm((prev) => ({
-      ...prev,
-      selectedTags: prev.selectedTags.includes(tag)
-        ? prev.selectedTags.filter((t) => t !== tag)
-        : [...prev.selectedTags, tag],
+    setForm((previous) => ({
+      ...previous,
+      selectedTags: previous.selectedTags.includes(tag)
+        ? previous.selectedTags.filter((entry) => entry !== tag)
+        : [...previous.selectedTags, tag],
     }));
   };
 
   const addCustomTag = () => {
-    const val = tagInput.trim();
-    if (val && !tags.includes(val)) {
-      setTags((prev) => [...prev, val]);
-      setForm((prev) => ({ ...prev, selectedTags: [...prev.selectedTags, val] }));
+    const value = tagInput.trim();
+    if (value && !tags.includes(value)) {
+      setTags((previous) => [...previous, value]);
+      setForm((previous) => ({ ...previous, selectedTags: [...previous.selectedTags, value] }));
     }
     setTagInput('');
   };
 
-  const deleteTag = (tag) => {
-    setTags((prev) => prev.filter((t) => t !== tag));
-    setForm((prev) => ({ ...prev, selectedTags: prev.selectedTags.filter((t) => t !== tag) }));
-  };
-
   const addCustomReason = () => {
-    const val = reasonInput.trim();
-    if (val && !reasons.includes(val)) {
-      setReasons((prev) => [...prev, val]);
-      handleChange('reason', val);
+    const value = reasonInput.trim();
+    if (value && !reasons.includes(value)) {
+      setReasons((previous) => [...previous, value]);
+      handleChange('reason', value);
     }
     setReasonInput('');
   };
 
-  const deleteReason = (r) => {
-    if (DEFAULT_REASONS.includes(r)) return;
-    setReasons((prev) => prev.filter((x) => x !== r));
-    if (form.reason === r) handleChange('reason', '生日');
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newErrors = {};
-    if (!form.name.trim()) newErrors.name = '请输入人名';
-    if (!form.date) newErrors.date = '请选择日期';
-    if (!form.reason.trim()) newErrors.reason = '请选择或输入事由';
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const nextErrors = {};
+    if (!form.name.trim()) nextErrors.name = '请输入人名';
+    if (!form.reason.trim()) nextErrors.reason = '请选择或输入事由';
+    if (!form.isLunar && !form.date) nextErrors.date = '请选择日期';
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
       return;
     }
-    onSave({ ...form, tags: form.selectedTags, selectedTags: undefined });
+
+    try {
+      setSaving(true);
+      let date = form.date;
+      if (form.isLunar) {
+        date = formatDateOnly(lunarDateToSolar(
+          Number(form.lunarYear),
+          Number(form.lunarMonth),
+          Number(form.lunarDay),
+          form.lunarLeap
+        ));
+      }
+      await onSave({
+        name: form.name,
+        date,
+        reason: form.reason,
+        notes: form.notes,
+        tags: form.selectedTags,
+        isLunar: form.isLunar,
+        recurrence: form.recurrence,
+        ...(form.isLunar
+          ? {
+              lunarYear: Number(form.lunarYear),
+              lunarMonth: Number(form.lunarMonth),
+              lunarDay: Number(form.lunarDay),
+              lunarLeap: form.lunarLeap,
+            }
+          : {}),
+      });
+    } catch (error) {
+      setErrors((previous) => ({ ...previous, submit: error.message || '保存失败' }));
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={saving ? undefined : onClose} role="presentation">
+      <div className="modal" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="memorial-form-title">
         <div className="modal-header">
-          <h2>{item ? '编辑纪念日' : '新增纪念日'}</h2>
-          <button className="modal-close" onClick={onClose}>✕</button>
+          <h2 id="memorial-form-title">{item ? '编辑纪念日' : '新增纪念日'}</h2>
+          <button className="modal-close" onClick={onClose} disabled={saving} aria-label="关闭表单">✕</button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>人名 *</label>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => handleChange('name', e.target.value)}
-              placeholder="请输入人名"
-            />
+            <label htmlFor="memorial-name">人名 *</label>
+            <input id="memorial-name" type="text" value={form.name} onChange={(event) => handleChange('name', event.target.value)} autoFocus />
             {errors.name && <span className="form-error">{errors.name}</span>}
           </div>
+
           <div className="form-group">
-            <label>日期 *</label>
-            <input
-              type="date"
-              value={form.date}
-              onChange={(e) => handleChange('date', e.target.value)}
-              onClick={(e) => e.preventDefault()}
-              onFocus={(e) => e.target.showPicker?.()}
-            />
-            <div className="lunar-toggle">
-              <button
-                type="button"
-                className={`lunar-toggle-switch ${form.isLunar ? 'on' : ''}`}
-                onClick={() => handleChange('isLunar', !form.isLunar)}
-              />
-              <span className="lunar-toggle-label">
-                {form.isLunar ? '农历日期' : '公历日期'}
-              </span>
+            <span className="form-label">日期类型</span>
+            <div className="segmented-control">
+              <button type="button" className={!form.isLunar ? 'selected' : ''} onClick={() => handleChange('isLunar', false)}>公历</button>
+              <button type="button" className={form.isLunar ? 'selected' : ''} onClick={() => handleChange('isLunar', true)}>农历</button>
             </div>
-            {errors.date && <span className="form-error">{errors.date}</span>}
           </div>
+
+          {form.isLunar ? (
+            <div className="form-group">
+              <span className="form-label">农历日期 *</span>
+              <div className="lunar-fields">
+                <input aria-label="农历年份" type="number" min="1900" max="2100" value={form.lunarYear} onChange={(event) => handleChange('lunarYear', Number(event.target.value))} />
+                <select aria-label="农历月份" value={form.lunarMonth} onChange={(event) => handleChange('lunarMonth', Number(event.target.value))}>
+                  {Array.from({ length: 12 }, (_, index) => <option key={index + 1} value={index + 1}>{index + 1}月</option>)}
+                </select>
+                <select aria-label="农历日期" value={form.lunarDay} onChange={(event) => handleChange('lunarDay', Number(event.target.value))}>
+                  {Array.from({ length: 30 }, (_, index) => <option key={index + 1} value={index + 1}>{index + 1}日</option>)}
+                </select>
+              </div>
+              <label className="checkbox-label">
+                <input type="checkbox" checked={form.lunarLeap} onChange={(event) => handleChange('lunarLeap', event.target.checked)} />
+                闰月
+              </label>
+            </div>
+          ) : (
+            <div className="form-group">
+              <label htmlFor="memorial-date">公历日期 *</label>
+              <input id="memorial-date" type="date" value={form.date} onChange={(event) => handleChange('date', event.target.value)} />
+              {errors.date && <span className="form-error">{errors.date}</span>}
+            </div>
+          )}
+
           <div className="form-group">
-            <label>事由 *</label>
+            <label htmlFor="memorial-recurrence">重复规则</label>
+            <select id="memorial-recurrence" value={form.recurrence} onChange={(event) => handleChange('recurrence', event.target.value)}>
+              <option value="yearly">每年重复</option>
+              <option value="once">仅一次</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <span className="form-label">事由 *</span>
             <div className="reason-options">
-              {reasons.map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  className={`reason-chip ${form.reason === r ? 'selected' : ''}`}
-                  onClick={() => handleChange('reason', r)}
-                >
-                  {r}
-                  {!DEFAULT_REASONS.includes(r) && (
-                    <span className="reason-delete" onClick={(e) => { e.stopPropagation(); deleteReason(r); }}>×</span>
-                  )}
-                </button>
+              {reasons.map((reason) => (
+                <button key={reason} type="button" className={`reason-chip ${form.reason === reason ? 'selected' : ''}`} onClick={() => handleChange('reason', reason)}>{reason}</button>
               ))}
             </div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-              <input
-                type="text"
-                value={reasonInput}
-                onChange={(e) => setReasonInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomReason(); } }}
-                placeholder="自定义事由..."
-                className="reason-custom"
-                style={{ flex: 1 }}
-              />
-              <button type="button" className="btn-save" style={{ padding: '6px 14px', fontSize: 12 }} onClick={addCustomReason}>添加</button>
+            <div className="inline-add">
+              <input type="text" value={reasonInput} onChange={(event) => setReasonInput(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); addCustomReason(); } }} placeholder="自定义事由…" />
+              <button type="button" className="btn-save btn-compact" onClick={addCustomReason}>添加</button>
             </div>
             {errors.reason && <span className="form-error">{errors.reason}</span>}
           </div>
+
           <div className="form-group">
-            <label>标签</label>
+            <span className="form-label">标签</span>
             <div className="tag-select">
               {tags.map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  className={`tag-option ${form.selectedTags.includes(tag) ? 'selected' : ''}`}
-                  onClick={() => toggleTag(tag)}
-                >
-                  {tag}
-                  {!DEFAULT_TAGS.includes(tag) && (
-                    <span className="reason-delete" onClick={(e) => { e.stopPropagation(); deleteTag(tag); }}>×</span>
-                  )}
-                </button>
+                <button key={tag} type="button" className={`tag-option ${form.selectedTags.includes(tag) ? 'selected' : ''}`} onClick={() => toggleTag(tag)}>{tag}</button>
               ))}
             </div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomTag(); } }}
-                placeholder="自定义标签..."
-                className="reason-custom"
-                style={{ flex: 1 }}
-              />
-              <button type="button" className="btn-save" style={{ padding: '6px 14px', fontSize: 12 }} onClick={addCustomTag}>添加</button>
+            <div className="inline-add">
+              <input type="text" value={tagInput} onChange={(event) => setTagInput(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); addCustomTag(); } }} placeholder="自定义标签…" />
+              <button type="button" className="btn-save btn-compact" onClick={addCustomTag}>添加</button>
             </div>
           </div>
+
           <div className="form-group">
-            <label>备注</label>
-            <textarea
-              value={form.notes}
-              onChange={(e) => handleChange('notes', e.target.value)}
-              placeholder="附加备注信息..."
-              rows={3}
-            />
+            <label htmlFor="memorial-notes">备注</label>
+            <textarea id="memorial-notes" value={form.notes} onChange={(event) => handleChange('notes', event.target.value)} rows={3} />
           </div>
+
+          {errors.submit && <div className="form-error form-submit-error" role="alert">{errors.submit}</div>}
           <div className="modal-actions">
-            <button type="button" className="btn-cancel" onClick={onClose}>取消</button>
-            <button type="submit" className="btn-save">{item ? '保存修改' : '添加'}</button>
+            <button type="button" className="btn-cancel" onClick={onClose} disabled={saving}>取消</button>
+            <button type="submit" className="btn-save" disabled={saving}>{saving ? '保存中…' : item ? '保存修改' : '添加'}</button>
           </div>
         </form>
       </div>

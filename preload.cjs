@@ -17,6 +17,14 @@ contextBridge.exposeInMainWorld('widgetAPI', {
   showWidget: () => ipcRenderer.invoke('widget:showWidget'),
   toggleWidget: () => ipcRenderer.invoke('widget:toggleWidget'),
   hideWidget: () => ipcRenderer.invoke('widget:hideWidget'),
-  onRefresh: (cb) => ipcRenderer.on('widget:refresh', () => cb()),
-  onRestoreAll: (cb) => ipcRenderer.on('widget:restoreAll', () => cb()),
+  onRefresh: (cb) => {
+    const handler = () => cb();
+    ipcRenderer.on('widget:refresh', handler);
+    return () => ipcRenderer.removeListener('widget:refresh', handler);
+  },
+  onRestoreAll: (cb) => {
+    const handler = () => cb();
+    ipcRenderer.on('widget:restoreAll', handler);
+    return () => ipcRenderer.removeListener('widget:restoreAll', handler);
+  },
 });

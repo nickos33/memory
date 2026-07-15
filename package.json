@@ -1,9 +1,10 @@
 {
   "name": "memorial-day-reminder",
-  "version": "1.0.0",
+  "version": "2.1.0",
   "description": "纪念日提醒软件 - 记录并提醒重要纪念日",
   "main": "main.mjs",
   "scripts": {
+    "test": "node --test test/*.test.mjs",
     "start": "ELECTRON_RUN_AS_NODE= webpack --config webpack.config.cjs && ELECTRON_RUN_AS_NODE= npm run pack && open \"release/mac-arm64/纪念日.app\"",
     "dev": "ELECTRON_RUN_AS_NODE= webpack --config webpack.config.cjs --watch & ELECTRON_RUN_AS_NODE= npx electron .",
     "build": "ELECTRON_RUN_AS_NODE= webpack --config webpack.config.cjs --mode production && ELECTRON_RUN_AS_NODE= npx electron-builder",
@@ -19,10 +20,10 @@
     },
     "files": [
       "main.mjs",
-      "main.cjs",
       "preload.cjs",
       "store.mjs",
       "notifications.mjs",
+      "src/shared/**",
       "public/**",
       "dist/**",
       "package.json",
@@ -55,7 +56,6 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "electron-store": "^8.2.0",
     "lunar-typescript": "^1.8.6",
     "node-cron": "^3.0.3",
     "react": "^18.3.1",

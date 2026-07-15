@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import './Widget.css';
+import { getNextOccurrence, getOccurrenceText } from '../../shared/memorial-date.mjs';
 
 function Widget() {
   const [memorials, setMemorials] = useState([]);
@@ -16,11 +17,10 @@ function Widget() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  useEffect(() => window.widgetAPI?.onRefresh?.(loadData), [loadData]);
+
   useEffect(() => {
-    window.widgetAPI?.onRestoreAll?.(() => {
-      setHiddenIds([]);
-      localStorage.setItem('widgetHiddenIds', JSON.stringify([]));
-    });
+    return window.widgetAPI?.onRestoreAll?.(restoreAll);
   }, []);
 
   useEffect(() => {
@@ -44,19 +44,7 @@ function Widget() {
   // Show ALL memorials (past + future), sort by date ascending
   const sorted = [...memorials]
     .filter((m) => !hiddenIds.includes(m.id))
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  const getCountdown = (dateStr) => {
-    const target = new Date(dateStr);
-    target.setHours(0, 0, 0, 0);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const diff = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
-    if (diff === 0) return '今天';
-    if (diff === 1) return '明天';
-    if (diff < 0) return `${Math.abs(diff)} 天前`;
-    return `${diff} 天后`;
-  };
+    .sort((a, b) => getNextOccurrence(a) - getNextOccurrence(b));
 
   const handleClick = (id) => {
     window.widgetAPI.openMain();
@@ -72,10 +60,16 @@ function Widget() {
           <div className="widget-empty">暂无纪念日</div>
         ) : (
           sorted.map((m) => {
-            const cd = getCountdown(m.date);
-            const isPast = cd.includes('天前');
-            const isSoon = cd === '今天' || cd === '明天';
-            const hidden = hiddenIds.includes(m.id);
+            const occurrence = getOccurrenceText(m);
+            const cd = occurrence.diffDays === 0
+              ? '今天'
+              : occurrence.diffDays === 1
+                ? '明天'
+                : occurrence.diffDays > 1
+                  ? `${occurrence.diffDays} 天后`
+                  : `${Math.abs(occurrence.diffDays)} 天前`;
+            const isPast = occurrence.diffDays < 0;
+            const isSoon = occurrence.isSoon;
             return (
               <div
                 key={m.id}
@@ -96,7 +90,7 @@ function Widget() {
         )}
         {hiddenIds.length > 0 && (
           <div className="widget-hidden-bar">
-            <span className="widget-hidden-text" onClick={() => setHiddenIds([])}>
+            <span className="widget-hidden-text" onClick={restoreAll}>
               已隐藏 {hiddenIds.length} 个 · 点击恢复全部
             </span>
           </div>

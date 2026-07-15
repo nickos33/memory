@@ -4,7 +4,7 @@ import SearchBar, { DEFAULT_TAGS } from './components/SearchBar.js';
 import AddEditForm from './components/AddEditForm.js';
 import ConfirmDialog from './components/ConfirmDialog.js';
 import ExportImportBar from './components/ExportImportBar.js';
-import { filterByTags } from './utils/helpers.js';
+import { filterByTags, getNextOccurrence, getOccurrenceText } from './utils/helpers.js';
 
 export default function App() {
   const [memorials, setMemorials] = useState([]);
@@ -15,10 +15,16 @@ export default function App() {
   const [editingItem, setEditingItem] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const loadData = useCallback(async () => {
-    const data = await window.memorialAPI.getAll();
-    setMemorials(data);
+    try {
+      const data = await window.memorialAPI.getAll();
+      setMemorials(data);
+      setErrorMessage('');
+    } catch (error) {
+      setErrorMessage(error.message || '读取纪念日数据失败');
+    }
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -40,42 +46,64 @@ export default function App() {
       const q = searchQuery.toLowerCase();
       if (
         !m.name.toLowerCase().includes(q) &&
-        !m.reason.toLowerCase().includes(q)
+        !m.reason.toLowerCase().includes(q) &&
+        !(m.notes || '').toLowerCase().includes(q)
       ) return false;
     }
     return filterByTags([m], selectedTags).length > 0;
   });
 
+  const nextMemory = [...memorials]
+    .sort((a, b) => getNextOccurrence(a) - getNextOccurrence(b))[0];
+  const nextMemoryText = nextMemory ? getOccurrenceText(nextMemory).text : '从今天开始记录';
+
   const handleAdd = () => { setEditingItem(null); setShowForm(true); };
   const handleEdit = (item) => { setEditingItem(item); setShowForm(true); };
 
   const handleSave = async (formData) => {
-    if (editingItem) {
-      await window.memorialAPI.update(editingItem.id, formData);
-    } else {
-      await window.memorialAPI.add(formData);
+    try {
+      if (editingItem) {
+        await window.memorialAPI.update(editingItem.id, formData);
+      } else {
+        await window.memorialAPI.add(formData);
+      }
+      setShowForm(false);
+      setEditingItem(null);
+      await loadData();
+    } catch (error) {
+      setErrorMessage(error.message || '保存失败');
+      throw error;
     }
-    setShowForm(false);
-    setEditingItem(null);
-    loadData();
   };
 
   const handleDelete = async () => {
     if (deleteTarget) {
-      await window.memorialAPI.delete(deleteTarget.id);
-      setDeleteTarget(null);
-      loadData();
+      try {
+        await window.memorialAPI.delete(deleteTarget.id);
+        setDeleteTarget(null);
+        await loadData();
+      } catch (error) {
+        setErrorMessage(error.message || '删除失败');
+      }
     }
   };
 
   const handleTogglePin = async (id) => {
-    await window.memorialAPI.togglePin(id);
-    loadData();
+    try {
+      await window.memorialAPI.togglePin(id);
+      await loadData();
+    } catch (error) {
+      setErrorMessage(error.message || '置顶操作失败');
+    }
   };
 
   const handleReorder = async (orderedIds) => {
-    await window.memorialAPI.reorder(orderedIds);
-    loadData();
+    try {
+      await window.memorialAPI.reorder(orderedIds);
+      await loadData();
+    } catch (error) {
+      setErrorMessage(error.message || '排序保存失败');
+    }
   };
 
   const handleDeleteTag = (tag) => {
@@ -86,24 +114,40 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1 className="memorials-title">Memory</h1>
+        <div className="brand-block">
+          <span className="brand-kicker">珍藏每一个重要时刻</span>
+          <h1 className="memorials-title">Memory</h1>
+        </div>
+        <div className="header-actions">
+          <button
+            className="btn-widget-toggle"
+            onClick={() => window.widgetAPI?.toggleWidget?.()}
+            title="显示或隐藏纪念日小组件"
+            aria-label="显示或隐藏纪念日小组件"
+          >
+            面板
+          </button>
+          <button
+            className={`btn-search ${searchOpen ? 'active' : ''}`}
+            onClick={() => setSearchOpen(!searchOpen)}
+            aria-expanded={searchOpen}
+          >
+            搜索
+          </button>
+          <button className="btn-add" onClick={handleAdd}>＋ 新增</button>
+        </div>
       </header>
-      <div className="header-actions">
-        <button
-          className="btn-widget-toggle"
-          onClick={() => window.widgetAPI?.toggleWidget?.()}
-          title="显示/隐藏纪念日小组件"
-        >
-          📌 面板
-        </button>
-        <button
-          className={`btn-search ${searchOpen ? 'active' : ''}`}
-          onClick={() => setSearchOpen(!searchOpen)}
-        >
-          🔍 搜索
-        </button>
-        <button className="btn-add" onClick={handleAdd}>+ 新增</button>
-      </div>
+      <section className="next-memory" aria-label="下一个重要日子">
+        <p className="next-memory-label">值得期待的日子</p>
+        <strong>{nextMemoryText}</strong>
+        <span>{nextMemory ? `${nextMemory.name} · ${nextMemory.reason}` : '添加第一条纪念日，留住属于你的故事'}</span>
+      </section>
+      {errorMessage && (
+        <div className="app-error" role="alert">
+          <span>{errorMessage}</span>
+          <button onClick={() => setErrorMessage('')} aria-label="关闭错误提示">×</button>
+        </div>
+      )}
       <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
@@ -119,8 +163,9 @@ export default function App() {
         onDelete={setDeleteTarget}
         onTogglePin={handleTogglePin}
         onReorder={handleReorder}
+        emptyMessage={memorials.length > 0 ? '没有符合条件的纪念日' : ''}
       />
-      <ExportImportBar onRefresh={loadData} />
+      <ExportImportBar onRefresh={loadData} onError={setErrorMessage} />
       {showForm && (
         <AddEditForm
           item={editingItem}
